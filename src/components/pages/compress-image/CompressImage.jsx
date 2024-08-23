@@ -1,8 +1,9 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import imageCompression from "browser-image-compression";
-import Image_cards from "@/components/comman/Image_cards";
+import ImageCards from "@/components/comman/Image_cards";
+import DragInputField from "@/components/comman/Drag_input_field";
 
 export default function CompressImage() {
   const [files, setFiles] = useState([]);
@@ -11,8 +12,8 @@ export default function CompressImage() {
   const [error, setError] = useState("");
   const [progress, setProgress] = useState(0);
 
-  const handleImageUpload = async (event) => {
-    const selectedFiles = Array.from(event.target.files);
+  const handleImageUpload = async (incomingFiles) => {
+    const selectedFiles = Array.from(incomingFiles);
     if (selectedFiles.length === 0) return;
 
     setFiles(selectedFiles);
@@ -67,7 +68,7 @@ export default function CompressImage() {
     }
   };
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (
       files.length > 0 &&
       currentFileIndex !== null &&
@@ -78,7 +79,7 @@ export default function CompressImage() {
   }, [files, currentFileIndex]);
 
   const handleDownloadAll = () => {
-    compressedFiles.forEach((compressedFile, index) => {
+    compressedFiles.forEach((compressedFile) => {
       if (compressedFile) {
         const url = URL.createObjectURL(compressedFile);
         const link = document.createElement("a");
@@ -94,23 +95,22 @@ export default function CompressImage() {
 
   return (
     <div className="compress-image">
-      <h1>Compress Images</h1>
-      <p>
-        Compress JPG, PNG, SVG, or GIF with the best quality and compression.
-      </p>
-      <input
-        type="file"
-        accept="image/*"
-        multiple
-        onChange={handleImageUpload}
-      />
+      <div className="py-10">
+        <h1 className="text-2xl">Compress Images</h1>
+        <p>
+          Compress JPG, PNG, GIF, BMP, WEBP, SVG, TIFF or ICO with the best
+          quality and compression.
+        </p>
+      </div>
+      <DragInputField handleFileChange={handleImageUpload} error={error} />
       {error && <p className="text-red-500">{error}</p>}
-
-      <div className="image-grid">
+      <div className="image-grid mt-10">
         <div className="gap-2 grid grid-cols-2 sm:grid-cols-5">
           {files.map((file, index) => (
-            <Image_cards
+            <ImageCards
               key={index}
+              progress={progress}
+              currentFileIndex={currentFileIndex}
               file={file}
               index={index}
               compressedFiles={compressedFiles}
@@ -118,7 +118,6 @@ export default function CompressImage() {
           ))}
         </div>
       </div>
-
       {compressedFiles.some((file) => file) && (
         <div className="mt-4">
           <button
@@ -131,25 +130,4 @@ export default function CompressImage() {
       )}
     </div>
   );
-}
-
-{
-  /* <img
-              src={URL.createObjectURL(file)}
-              alt={`Original ${index}`}
-              className={`image-preview ${
-                compressedFiles[index] ? "compressed" : ""
-              }`}
-              style={{
-                opacity: compressedFiles[index] ? 1 : 0.4, // Show full opacity if compressed
-              }}
-            />
-            {currentFileIndex === index && (
-              <div className="progress-bar-container">
-                <div
-                  className="progress-bar-inner"
-                  style={{ width: `${progress}%` }}
-                />
-              </div>
-            )} */
 }
