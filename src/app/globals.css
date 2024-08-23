@@ -15,6 +15,21 @@
     --background-end-rgb: 0, 0, 0;
   }
 }
+.progress-bar {
+  width: 100%;
+  background-color: #e0e0e0;
+  border-radius: 5px;
+  overflow: hidden;
+  margin-top: 10px;
+}
+
+.progress-bar-inner {
+  height: 20px;
+  background-color: #4caf50;
+  width: 0%;
+  transition: width 0.3s;
+}
+
 
 body {
   color: rgb(var(--foreground-rgb));
