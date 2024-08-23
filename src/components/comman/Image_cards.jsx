@@ -8,7 +8,6 @@ export default function Image_cards({
   file,
   progress,
 }) {
-    
   function formatFileSize(bytes) {
     if (bytes >= 1024 * 1024) {
       return `${(bytes / (1024 * 1024)).toFixed(2)} MB`;
@@ -51,13 +50,29 @@ export default function Image_cards({
         />
       </CardBody>
       <CardFooter className="text-small justify-between">
-        <div>
+        <div className="text-center">
           <b>{file.name}</b>
           <p className="text-default-500">
-            {" "}
             <b>Orignal size:</b> {formatFileSize(file.size)}
           </p>
-          {currentFileIndex === index ? (
+          {currentFileIndex === index && (
+            <Progress size="sm" aria-label="Loading..." value={progress} />
+          )}
+          {compressedFiles[index] && (
+            <div>
+              {" "}
+              <p className="text-default-500">
+                {" "}
+                <b>Compressed size:</b>{" "}
+                {formatFileSize(compressedFiles[index]?.size)}
+              </p>
+              <p className="text-default-500">
+                {" "}
+                <b>Type</b> {getFileExtension(compressedFiles[index]?.type)}
+              </p>
+            </div>
+          )}
+          {/* {currentFileIndex === index ? (
             <Progress size="sm" aria-label="Loading..." value={progress} />
           ) : (
             <div>
@@ -72,7 +87,7 @@ export default function Image_cards({
                 <b>Type</b> {getFileExtension(compressedFiles[index]?.type)}
               </p>
             </div>
-          )}
+          )} */}
         </div>
       </CardFooter>
     </Card>

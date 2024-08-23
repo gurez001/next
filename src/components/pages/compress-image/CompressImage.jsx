@@ -4,6 +4,8 @@ import React, { useState, useEffect } from "react";
 import imageCompression from "browser-image-compression";
 import ImageCards from "@/components/comman/Image_cards";
 import DragInputField from "@/components/comman/Drag_input_field";
+import JSZip from "jszip";
+import { saveAs } from "file-saver";
 
 export default function CompressImage() {
   const [files, setFiles] = useState([]);
@@ -64,7 +66,6 @@ export default function CompressImage() {
       }
     } catch (error) {
       setError("Failed to compress image. Please try again.");
-      console.error("Error compressing image:", error);
     }
   };
 
@@ -78,8 +79,10 @@ export default function CompressImage() {
     }
   }, [files, currentFileIndex]);
 
-  const handleDownloadAll = () => {
-    compressedFiles.forEach((compressedFile) => {
+  const handleDownloadAll = async () => {
+    if (compressedFiles.length === 1) {
+      // Download the single compressed file directly
+      const compressedFile = compressedFiles[0];
       if (compressedFile) {
         const url = URL.createObjectURL(compressedFile);
         const link = document.createElement("a");
@@ -90,7 +93,34 @@ export default function CompressImage() {
         document.body.removeChild(link);
         URL.revokeObjectURL(url);
       }
-    });
+    } else if (compressedFiles.length > 1) {
+      const zip = new JSZip();
+
+      // Add each compressed file to the zip
+      compressedFiles.forEach((compressedFile) => {
+        if (compressedFile) {
+          zip.file(`compressed_${compressedFile.name}`, compressedFile);
+        }
+      });
+
+      try {
+        // Generate the zip file asynchronously
+        const content = await zip.generateAsync({ type: "blob" });
+
+        // Save the zip file using FileSaver.js
+        saveAs(content, "compressed_images.zip");
+      } catch (error) {
+        setError("Error creating ZIP file:", error);
+      }
+    }
+  };
+
+  const handleRemoveAll = () => {
+    setCompressedFiles([]); // Clear all compressed files
+    setFiles([]); // Optionally, clear the original files as well
+    setCurrentFileIndex(null); // Reset the index
+    setError(""); // Clear any errors
+    setProgress(0); // Reset progress
   };
 
   return (
@@ -121,10 +151,21 @@ export default function CompressImage() {
       {compressedFiles.some((file) => file) && (
         <div className="mt-4">
           <button
-            className="mt-2 bg-blue-500 text-white py-2 px-4 rounded"
-            onClick={handleDownloadAll}
+           className={`mt-2 py-2 px-4 rounded ${
+            files.length !== compressedFiles.length
+              ? "bg-gray-400 cursor-not-allowed"
+              : "bg-blue-500 text-white"
+          }`}
+          onClick={handleDownloadAll}
+          disabled={files.length !== compressedFiles.length}
           >
             Download All Compressed Images
+          </button>
+          <button
+            className="mt-2 bg-red-500 text-white py-2 px-4 rounded ml-2"
+            onClick={handleRemoveAll}
+          >
+            Remove All Compressed Images
           </button>
         </div>
       )}
