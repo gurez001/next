@@ -3,28 +3,27 @@ import { useDropzone } from "react-dropzone";
 
 const CompressImage = ({ handleFileChange }) => {
   const [files, setFiles] = useState([]);
+  const maxFiles = 10;
 
   const onDrop = (acceptedFiles) => {
-    const fileArray = acceptedFiles.map((file) =>
+    // Combine new files with existing files
+    if (acceptedFiles.length > maxFiles) {
+      alert(`You can only upload up to ${maxFiles} files.`);
+      return; // Prevent adding new files
+    }
+    const newFiles = acceptedFiles.map((file) =>
       Object.assign(file, {
         preview: URL.createObjectURL(file),
       })
     );
-    setFiles((prevFiles) => [
-      ...prevFiles,
-      ...acceptedFiles.map((file) =>
-        Object.assign(file, {
-          preview: URL.createObjectURL(file),
-        })
-      ),
-    ]);
 
-    handleFileChange(fileArray);
-  };
+    // Check if adding the new files will exceed the maximum allowed files
 
-  const removeFile = (file) => {
-    setFiles((prevFiles) => prevFiles.filter((f) => f !== file));
-    URL.revokeObjectURL(file.preview); // Clean up the URL object
+    // Update state with new files
+    setFiles((prevFiles) => [...prevFiles, ...newFiles]);
+
+    // Notify parent component with new files
+    handleFileChange(newFiles);
   };
 
   const { getRootProps, getInputProps } = useDropzone({

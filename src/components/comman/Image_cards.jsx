@@ -50,7 +50,7 @@ export default function Image_cards({
         />
       </CardBody>
       <CardFooter className="text-small justify-between">
-        <div className="text-center">
+        <div className="text-center w-full">
           <b>{file.name}</b>
           <p className="text-default-500">
             <b>Orignal size:</b> {formatFileSize(file.size)}
