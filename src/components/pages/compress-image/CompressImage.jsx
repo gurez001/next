@@ -13,7 +13,7 @@ export default function CompressImage() {
   const [currentFileIndex, setCurrentFileIndex] = useState(null);
   const [error, setError] = useState("");
   const [progress, setProgress] = useState(0);
-
+  const maxFiles = 10;
   const handleImageUpload = async (incomingFiles) => {
     const selectedFiles = Array.from(incomingFiles);
     if (selectedFiles.length === 0) return;
@@ -23,6 +23,23 @@ export default function CompressImage() {
     setError("");
     setCurrentFileIndex(0); // Start with the first file
   };
+
+  const onDrop = (acceptedFiles) => {
+    // Combine new files with existing files
+    if (acceptedFiles.length > maxFiles) {
+      alert(`You can only upload up to ${maxFiles} files.`);
+      return; // Prevent adding new files
+    }
+    const newFiles = acceptedFiles.map((file) =>
+      Object.assign(file, {
+        preview: URL.createObjectURL(file),
+      })
+    );
+
+    // Notify parent component with new files
+    handleImageUpload(newFiles);
+  };
+
 
   const compressNextFile = async () => {
     if (currentFileIndex === null || currentFileIndex >= files.length) return;
@@ -132,7 +149,7 @@ export default function CompressImage() {
           quality and compression.
         </p>
       </div>
-      <DragInputField handleFileChange={handleImageUpload} error={error} />
+      <DragInputField onDrop={onDrop}  />
       {error && <p className="text-red-500">{error}</p>}
       <div className="image-grid mt-10">
         <div className="gap-2 grid grid-cols-2 sm:grid-cols-5">

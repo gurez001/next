@@ -3,7 +3,7 @@ import { Card, CardFooter, Image, Button } from "@nextui-org/react";
 import Link from 'next/link'
 export default function Cards() {
   return (
-    <Link href="/compress-image">
+    <Link href="/resize-image">
       <Card isFooterBlurred radius="lg" className="border-none">
         <Image
           alt="Woman listing to music"
